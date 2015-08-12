@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"hash/fnv"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -65,19 +66,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error creating stdout pipe for command: ", err)
 		return
 	}
-	scannerStdout := bufio.NewScanner(cmdStdout)
-	go func() {
-		for scannerStdout.Scan() {
-			now := time.Now().Format(time.RFC3339)
-			fmt.Printf(
-				"%s %s %s %s\n",
-				coloredServer,
-				now,
-				ColorStream("out", "stdout"),
-				scannerStdout.Text(),
-			)
-		}
-	}()
+	HandlePipe(cmdStdout, coloredServer, ColorStream("out", "stdout"))
 
 	//handle stderr
 	cmdStderr, err := cmd.StderrPipe()
@@ -85,19 +74,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error creating stderr pipe for command: ", err)
 		return
 	}
-	scannerStderr := bufio.NewScanner(cmdStderr)
-	go func() {
-		for scannerStderr.Scan() {
-			now := time.Now().Format(time.RFC3339)
-			fmt.Printf(
-				"%s %s %s %s\n",
-				coloredServer,
-				now,
-				ColorStream("ERR", "stderr"),
-				scannerStderr.Text(),
-			)
-		}
-	}()
+	HandlePipe(cmdStderr, coloredServer, ColorStream("ERR", "stderr"))
 
 	//launch command
 	err = cmd.Start()
@@ -156,4 +133,15 @@ func ColorStream(message string, stream string) string {
 		//turn it into an error?
 		return message
 	}
+}
+
+// Handle reading on stdout/stderr
+func HandlePipe(pipe io.ReadCloser, prefix string, marker string) {
+	scanner := bufio.NewScanner(pipe)
+	go func() {
+		for scanner.Scan() {
+			now := time.Now().Format(time.RFC3339)
+			fmt.Printf("%s %s %s %s\n", prefix, now, marker, scanner.Text())
+		}
+	}()
 }
