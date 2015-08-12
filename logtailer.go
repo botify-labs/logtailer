@@ -95,7 +95,7 @@ func tailServerLogs(server string, files []string) {
 // The color shouldn't vary for a given hostname so we calculate
 // a numeric hash for the hostname and reduce it to a list of colors
 func ColorHostname(hostname string) string {
-	if !strings.HasPrefix(os.Getenv("TERM"), "xterm") {
+	if !TermSupportsColors() {
 		return hostname
 	}
 	validColors := []string{
@@ -117,14 +117,12 @@ func HashHostnameToInt(str string) int {
 
 // Helper to colorize stdout/stdin markers (red=err, green=out)
 func ColorStream(message string, stream string) string {
-	colorOkay := ""
-	colorFail := ""
-	colorReset := ""
-	if strings.HasPrefix(os.Getenv("TERM"), "xterm") {
-		colorOkay = "\x1b[32m"
-		colorFail = "\x1b[31m"
-		colorReset = "\x1b[0m"
+	if !TermSupportsColors() {
+		return message
 	}
+	colorOkay := "\x1b[32m"
+	colorFail := "\x1b[31m"
+	colorReset := "\x1b[0m"
 	if stream == "stdout" {
 		return colorOkay + message + colorReset
 	} else if stream == "stderr" {
@@ -144,4 +142,9 @@ func HandlePipe(pipe io.ReadCloser, prefix string, marker string) {
 			fmt.Printf("%s %s %s %s\n", prefix, now, marker, scanner.Text())
 		}
 	}()
+}
+
+// Does current terminal support colors?
+func TermSupportsColors() bool {
+	return strings.HasPrefix(os.Getenv("TERM"), "xterm")
 }
