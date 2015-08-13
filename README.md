@@ -1,5 +1,5 @@
-Logtailer : multi-hosts "tail -f" for your logs
-===============================================
+logtailer : multi-hosts "tail -f"
+=================================
 
 **NB: this repo is in very early alpha, use at your own risks!**
 
