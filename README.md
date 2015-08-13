@@ -28,7 +28,7 @@ sudo chmod +x /usr/local/bin/logtailer
 
 If you want to build a *development* version, use `go run` yourself:
 ```
-go run logtailer.log <server(s)> <file(s)>
+go run logtailer.go <server(s)> <file(s)>
 ```
 
 
