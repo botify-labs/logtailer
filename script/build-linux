@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+cd $(dirname $0)/..
+
+rm -f build/logtailer_linux-amd64
+
+docker run -v $(pwd):/go golang:1.4.2 go build -o build/logtailer_linux-amd64
+
+md5 -q build/logtailer_linux-amd64 > build/logtailer_linux-amd64.md5

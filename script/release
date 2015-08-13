@@ -1,0 +1,81 @@
+#!/bin/bash
+set -e
+
+#SAFEGUARDS
+
+if test -z "$GITHUB_TOKEN"; then
+  echo "GITHUB_TOKEN not set, github-release won't be able to create a release, exiting..." >&2
+  exit 1
+fi
+
+if test -z "$1"; then
+  echo "Usage: $0 <tag> [description]" >&2
+  exit 1
+fi
+tag=$1
+shift
+description="$*"
+
+if ! which docker >/dev/null; then
+  echo "Missing docker binary, exiting..." >&2
+  exit 1
+fi
+
+if ! which github-release >/dev/null; then
+  echo "Missing github-release binary, exiting..." >&2
+  exit 1
+fi
+
+# UTILITY FUNCTIONS
+upload() {
+  step "UPLOADING $1"
+  github-release upload \
+      --user botify-labs \
+      --repo logtailer \
+      --tag $tag \
+      --name "$1" \
+      --file "$2"
+}
+step() {
+  echo
+  echo "* $*"
+  echo "* $*"|perl -pe 's/./-/g'
+}
+
+cd $(dirname $0)/..
+
+step "UPDATING README"
+cat README.md | \
+  perl -pe "s#(github.com/botify-labs/logtailer/releases/download)/.*?/#\$1/$tag/#" | \
+  tee README.md.new >/dev/null
+mv -f README.md.new README.md
+git add README.md
+
+step "BUILDING FOR MAC OSX"
+./script/build-darwin
+
+step "BUILDING FOR LINUX"
+./script/build-linux
+
+step "COMMIT"
+git commit -m "Bump version to $tag"
+git push origin master
+
+step "TAGGING $tag"
+git tag $tag && git push --tags
+
+step "CREATING GH RELEASE"
+github-release release \
+    --user botify-labs \
+    --repo logtailer \
+    --tag $tag \
+    --description "$description"
+    #--name "the wolf of source street" \
+    #--pre-release
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  upload logtailer_darwin-amd64 build/logtailer_darwin-amd64
+  upload logtailer_darwin-amd64.md5 build/logtailer_darwin-amd64.md5
+fi
+upload logtailer_linux-amd64 build/logtailer_linux-amd64
+upload logtailer_linux-amd64.md5 build/logtailer_linux-amd64.md5

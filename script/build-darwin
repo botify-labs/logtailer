@@ -1,0 +1,14 @@
+#!/bin/bash
+set -e
+
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  echo "This script only targets Mac OSX" >&2
+  exit 1
+fi
+
+cd $(dirname $0)/..
+
+rm -f build/logtailer_darwin-amd64
+
+go build -o build/logtailer_darwin-amd64
+md5 -q build/logtailer_darwin-amd64 > build/logtailer_darwin-amd64.md5

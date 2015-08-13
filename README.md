@@ -10,10 +10,27 @@ Ctrl+C.
 Installation
 ------------
 
-Until there are releases, you'd better use `go run` or `go build` yourself:
+Go download the correct version of the tool on the [releases page](https://github.com/botify-labs/logtailer/releases).
+
+If you better like command-line, here we go:
+
+... for Linux 64bits users:
+```
+sudo curl -L https://github.com/botify-labs/logtailer/releases/download/nope/logtailer_linux-amd64 -o /usr/local/bin/logtailer
+sudo chmod +x /usr/local/bin/logtailer
+```
+
+... for Mac OSX users:
+```
+sudo curl -L https://github.com/botify-labs/logtailer/releases/download/nope/logtailer_darwin-amd64 -o /usr/local/bin/logtailer
+sudo chmod +x /usr/local/bin/logtailer
+```
+
+If you want to build a *development* version, use `go run` yourself:
 ```
 go run logtailer.log <server(s)> <file(s)>
 ```
+
 
 Usage
 -----
@@ -34,6 +51,7 @@ logtrailer elasticsearch{1,2,3}.example.net "/var/log/elasticsearch/*.log"
 logtrailer server.example.net /var/log/syslog "/var/log/**/*.log"
 #=> will follow basically all logs on server.example.net
 ```
+
 
 References
 ----------
