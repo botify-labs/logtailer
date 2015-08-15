@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if ! which go >/dev/null; then
+  echo "Please install 'go' (aka golang) https://golang.org/doc/install" >&2
+  exit 1
+fi
+
+echo "Installing golint"
+go get -u github.com/golang/lint/golint

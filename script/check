@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "* Applying go fmt"
+go fmt
+echo
+
+echo "* Applying golint"
+golint
+echo
