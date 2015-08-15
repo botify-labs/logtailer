@@ -1,9 +1,14 @@
 #!/bin/bash
 
+exitcode=0
+
 echo "* Applying go fmt"
 go fmt
 echo
 
 echo "* Applying golint"
-golint
-echo
+lint="$(golint)"
+[ "$lint" == "" ] || exitcode=1
+echo "$lint"
+
+exit $exitcode
