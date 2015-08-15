@@ -7,12 +7,19 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 	"sync"
 	"time"
 )
 
-//TODO: handle signals, especially SIGINT!
+// This anonymous struct will store some global state
+// Note that in our case, having global state is a priori *not* a problem per se,
+// but if you think there's a better way, let's discuss it!
+var state struct {
+	Processes []*os.Process
+}
+
 func main() {
 	//args parsing
 	var servers []string
@@ -33,6 +40,9 @@ func main() {
 
 	//this will help us wait instead of exiting directly
 	var wg sync.WaitGroup
+
+	//signal handling
+	go HandleCtrlC()
 
 	//for each server, let's tail the logs (async!)
 	for _, server := range servers {
@@ -82,6 +92,9 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error starting command: ", err)
 		return
 	}
+
+	//add process to state for later kill
+	state.Processes = append(state.Processes, cmd.Process)
 
 	//wait for it to end
 	err = cmd.Wait()
@@ -147,4 +160,18 @@ func HandlePipe(pipe io.ReadCloser, prefix string, marker string) {
 // TermSupportsColors checks whether current terminal support colors
 func TermSupportsColors() bool {
 	return strings.HasPrefix(os.Getenv("TERM"), "xterm")
+}
+
+// HandleCtrlC handles SIGINT signal when a user types Ctrl+C to stop execution
+func HandleCtrlC() {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt)
+	<-signals
+	for _, process := range state.Processes {
+		if process != nil {
+			fmt.Println("Stopping", process.Pid)
+			process.Kill()
+		}
+	}
+	os.Exit(0)
 }
