@@ -2,13 +2,14 @@
 
 exitcode=0
 
-echo "* Applying go fmt"
+# Applying go formatting
 go fmt
-echo
 
-echo "* Applying golint"
+# Applying golint
 lint="$(golint)"
-[ "$lint" == "" ] || exitcode=1
-echo "$lint"
+if [ "$lint" != "" ]; then
+  exitcode=1
+  echo "$lint"
+fi
 
 exit $exitcode
