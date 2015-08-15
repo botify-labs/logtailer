@@ -84,7 +84,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error creating stderr pipe for command: ", err)
 		return
 	}
-	HandlePipe(cmdStderr, coloredServer, ColorStream("ERR", "stderr"))
+	HandlePipe(cmdStderr, coloredServer, ColorStream("err", "stderr"))
 
 	//launch command
 	err = cmd.Start()
