@@ -64,5 +64,6 @@ Useful references:
 - running a command: http://nathanleclaire.com/blog/2014/12/29/shelled-out-commands-in-golang/
 - streaming logs + ANSI colors: http://kvz.io/blog/2013/07/12/prefix-streaming-stdout-and-stderr-in-golang/
 - time formatting: http://stackoverflow.com/questions/5885486/how-do-i-get-the-current-timestamp-in-go
-- signal handling: http://stackoverflow.com/questions/11886531/terminating-a-process-started-with-os-exec-in-golang
+- signal handling: http://stackoverflow.com/questions/11268943/golang-is-it-possible-to-capture-a-ctrlc-signal-and-run-a-cleanup-function-in
+- terminating processes: http://stackoverflow.com/questions/11886531/terminating-a-process-started-with-os-exec-in-golang
 - waiting goroutines with a wait group: http://stackoverflow.com/questions/18405023/how-would-you-define-a-pool-of-goroutines-to-be-executed-at-once-in-golang
