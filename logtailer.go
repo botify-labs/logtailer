@@ -91,7 +91,7 @@ func tailServerLogs(server string, files []string) {
 	}
 }
 
-// Returns a colorized version of the hostname
+// ColorHostname returns a colorized version of the hostname
 // The color shouldn't vary for a given hostname so we calculate
 // a numeric hash for the hostname and reduce it to a list of colors
 func ColorHostname(hostname string) string {
@@ -108,14 +108,14 @@ func ColorHostname(hostname string) string {
 	return colorHost + hostname + colorReset
 }
 
-// Generates a numeric hash out of a string
+// HashHostnameToInt generates a numeric hash out of a string
 func HashHostnameToInt(str string) int {
 	h := fnv.New32a()
 	h.Write([]byte(str))
 	return int(h.Sum32())
 }
 
-// Helper to colorize stdout/stdin markers (red=err, green=out)
+// ColorStream colorizes stdout/stdin markers (red=err, green=out)
 func ColorStream(message string, stream string) string {
 	if !TermSupportsColors() {
 		return message
@@ -133,7 +133,7 @@ func ColorStream(message string, stream string) string {
 	}
 }
 
-// Handle reading on stdout/stderr
+// HandlePipe handles reading on stdout/stderr
 func HandlePipe(pipe io.ReadCloser, prefix string, marker string) {
 	scanner := bufio.NewScanner(pipe)
 	go func() {
@@ -144,7 +144,7 @@ func HandlePipe(pipe io.ReadCloser, prefix string, marker string) {
 	}()
 }
 
-// Does current terminal support colors?
+// TermSupportsColors checks whether current terminal support colors
 func TermSupportsColors() bool {
 	return strings.HasPrefix(os.Getenv("TERM"), "xterm")
 }
