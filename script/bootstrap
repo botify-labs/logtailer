@@ -7,3 +7,6 @@ fi
 
 echo "Installing golint"
 go get -u github.com/golang/lint/golint
+
+echo "Installing govet"
+go get golang.org/x/tools/cmd/vet

@@ -12,4 +12,7 @@ if [ "$lint" != "" ]; then
   echo "$lint"
 fi
 
+# Applying govet
+go vet .
+
 exit $exitcode
