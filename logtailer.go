@@ -92,6 +92,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error starting command: ", err)
 		return
 	}
+	fmt.Println("Connecting to", server)
 
 	//add process to state for later kill
 	state.Processes = append(state.Processes, cmd.Process)
@@ -169,7 +170,7 @@ func HandleCtrlC() {
 	<-signals
 	for _, process := range state.Processes {
 		if process != nil {
-			fmt.Println("Stopping", process.Pid)
+			fmt.Println("Stopping process", process.Pid)
 			process.Kill()
 		}
 	}
