@@ -20,15 +20,42 @@ var state struct {
 	Processes []*os.Process
 }
 
+// Server model (kind of)
+type Server struct {
+	hostname         string
+	_coloredHostname string
+}
+
+// coloredHostname() returns a colorized version of the hostname
+// The color shouldn't vary for a given hostname so we calculate
+// a numeric hash for the hostname and reduce it to a list of colors
+func (s *Server) coloredHostname() string {
+	if s._coloredHostname != "" {
+		return s._coloredHostname
+	}
+	if !TermSupportsColors() {
+		return s.hostname
+	}
+	validColors := []string{
+		"33", "34", "35", "36", "37",
+	}
+	colorIndex := HashHostnameToInt(s.hostname) % len(validColors)
+	color := validColors[colorIndex]
+	colorReset := "\x1b[0m"
+	colorHost := "\x1b[" + color + "m"
+	s._coloredHostname = colorHost + s.hostname + colorReset
+	return s._coloredHostname
+}
+
 func main() {
 	//args parsing
-	var servers []string
+	var servers []Server
 	var files []string
 	for _, elem := range os.Args[1:] {
 		if strings.HasPrefix(elem, "/") {
 			files = append(files, elem)
 		} else {
-			servers = append(servers, elem)
+			servers = append(servers, Server{hostname: elem})
 		}
 	}
 
@@ -47,7 +74,7 @@ func main() {
 	//for each server, let's tail the logs (async!)
 	for _, server := range servers {
 		wg.Add(1)
-		go func(server string) {
+		go func(server Server) {
 			tailServerLogs(server, files)
 			wg.Done()
 		}(server)
@@ -58,14 +85,11 @@ func main() {
 }
 
 //tail logs on a remote server
-func tailServerLogs(server string, files []string) {
-	//for later use in output
-	coloredServer := ColorHostname(server)
-
+func tailServerLogs(server Server, files []string) {
 	//build command
 	cmdName := "ssh"
 	tailCmd := "sudo tail -n 0 -F " + strings.Join(files, " ")
-	cmdArgs := []string{server, tailCmd}
+	cmdArgs := []string{server.hostname, tailCmd}
 
 	//prepare command
 	cmd := exec.Command(cmdName, cmdArgs...)
@@ -76,7 +100,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error creating stdout pipe for command: ", err)
 		return
 	}
-	HandlePipe(cmdStdout, coloredServer, ColorStream("out", "stdout"))
+	HandlePipe(cmdStdout, server.coloredHostname(), ColorStream("out", "stdout"))
 
 	//handle stderr
 	cmdStderr, err := cmd.StderrPipe()
@@ -84,7 +108,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error creating stderr pipe for command: ", err)
 		return
 	}
-	HandlePipe(cmdStderr, coloredServer, ColorStream("err", "stderr"))
+	HandlePipe(cmdStderr, server.coloredHostname(), ColorStream("err", "stderr"))
 
 	//launch command
 	err = cmd.Start()
@@ -92,7 +116,7 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error starting command: ", err)
 		return
 	}
-	fmt.Println("Connecting to", server)
+	fmt.Println("Connecting to", server.hostname)
 
 	//add process to state for later kill
 	state.Processes = append(state.Processes, cmd.Process)
@@ -103,23 +127,6 @@ func tailServerLogs(server string, files []string) {
 		fmt.Fprintln(os.Stderr, "Error waiting for command: ", err)
 		return
 	}
-}
-
-// ColorHostname returns a colorized version of the hostname
-// The color shouldn't vary for a given hostname so we calculate
-// a numeric hash for the hostname and reduce it to a list of colors
-func ColorHostname(hostname string) string {
-	if !TermSupportsColors() {
-		return hostname
-	}
-	validColors := []string{
-		"33", "34", "35", "36", "37",
-	}
-	colorIndex := HashHostnameToInt(hostname) % len(validColors)
-	color := validColors[colorIndex]
-	colorReset := "\x1b[0m"
-	colorHost := "\x1b[" + color + "m"
-	return colorHost + hostname + colorReset
 }
 
 // HashHostnameToInt generates a numeric hash out of a string
