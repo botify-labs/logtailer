@@ -37,7 +37,7 @@ Usage
 
 Generic usage:
 ```
-logtrailer <host1, [host2, host3, ...]> <file1, [file2, file3, ...]>
+logtrailer <host1 [host2 host3 ...]> <file1 [file2 file3 ...]>
 ```
 
 Given you can use shell expansion on your side, and shell globing for some
