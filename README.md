@@ -16,13 +16,13 @@ If you better like command-line, here we go:
 
 ... for Linux 64bits users:
 ```
-sudo curl -L https://github.com/botify-labs/logtailer/releases/download/0.0.1/logtailer_linux-amd64 -o /usr/local/bin/logtailer
+sudo curl -L https://github.com/botify-labs/logtailer/releases/download/0.0.2/logtailer_linux-amd64 -o /usr/local/bin/logtailer
 sudo chmod +x /usr/local/bin/logtailer
 ```
 
 ... for Mac OSX users:
 ```
-sudo curl -L https://github.com/botify-labs/logtailer/releases/download/0.0.1/logtailer_darwin-amd64 -o /usr/local/bin/logtailer
+sudo curl -L https://github.com/botify-labs/logtailer/releases/download/0.0.2/logtailer_darwin-amd64 -o /usr/local/bin/logtailer
 sudo chmod +x /usr/local/bin/logtailer
 ```
 
