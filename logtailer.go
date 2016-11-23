@@ -51,9 +51,13 @@ func main() {
 	//args parsing
 	var servers []Server
 	var files []string
+	var n string
+	n = "0"
 	for _, elem := range os.Args[1:] {
 		if strings.HasPrefix(elem, "/") {
 			files = append(files, elem)
+		} else if strings.HasPrefix(elem, "-n") {
+			n = elem[2:]
 		} else {
 			servers = append(servers, Server{hostname: elem})
 		}
@@ -75,7 +79,7 @@ func main() {
 	for _, server := range servers {
 		wg.Add(1)
 		go func(server Server) {
-			tailServerLogs(server, files)
+			tailServerLogs(server, files, n)
 			wg.Done()
 		}(server)
 	}
@@ -85,10 +89,10 @@ func main() {
 }
 
 //tail logs on a remote server
-func tailServerLogs(server Server, files []string) {
+func tailServerLogs(server Server, files []string, n string) {
 	//build command
 	cmdName := "ssh"
-	tailCmd := "sudo tail -n 0 -F " + strings.Join(files, " ")
+	tailCmd := "sudo tail -n " + n + " -F " + strings.Join(files, " ")
 	cmdArgs := []string{server.hostname, tailCmd}
 
 	//prepare command

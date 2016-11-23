@@ -37,7 +37,7 @@ Usage
 
 Generic usage:
 ```
-logtrailer <host1 [host2 host3 ...]> <file1 [file2 file3 ...]>
+logtrailer [-n150] <host1 [host2 host3 ...]> <file1 [file2 file3 ...]>
 ```
 
 Given you can use shell expansion on your side, and shell globing for some
@@ -48,7 +48,7 @@ Examples:
 logtrailer elasticsearch{1,2,3}.example.net "/var/log/elasticsearch/*.log"
 #=> will follow all logs inside this folder for those 3 machines
 
-logtrailer server.example.net /var/log/syslog "/var/log/**/*.log"
+logtrailer -n25 server.example.net /var/log/syslog "/var/log/**/*.log"
 #=> will follow basically all logs on server.example.net
 ```
 
